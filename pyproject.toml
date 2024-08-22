@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml_scripts"
+description = "A toy repo of machine learning related scripts"
+version = "1.0.0"
+readme = "README.md"
+license = {file="LICENSE.md"}
+authors = [
+    {name = "Xiaorui Dong", email = "xiaoruidong.2023@gmail.com"}
+]
+keywords = [
+    "machine learning",
+    "cheminformatics",
+    "graph neural network",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+dependencies = [
+    "torch>=2.1",
+    "torch_geometric",
+    "numpy",
+    "scipy",
+    "pandas",
+    "scikit-learn",
+    "rdkit"
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = [
+    "autopep8",
+    "black",
+    "isort",
+    "pytest",
+    "pytest-cov",
+]
+notebooks = [
+    "ipykernel",
+    "matplotlib",
+    "seaborn",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311"]
+
+[tool.autopep8]
+in_place = true
+recursive = true
+max_line_length = 88
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+addopts = "--cov src --cov-report term --cov-report html"
+testpaths = "test"
+python_files = "test_*.py"

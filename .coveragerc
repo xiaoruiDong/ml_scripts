@@ -1,0 +1,9 @@
+[report]
+show_missing = False
+exclude_lines =
+    def __repr__
+    logger.warning
+    if __name__ == .__main__.:
+
+[html]
+directory = ./coverage/html
