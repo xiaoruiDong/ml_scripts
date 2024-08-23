@@ -35,13 +35,29 @@ def get_hparams_combinations(
     Yields:
         tuple: Model hyperparameters and training hyperparameters.
     """
-    train_keys, train_vals = zip(*train_hparams_grid.items())
-    model_keys, model_vals = zip(*model_hparams_grid.items())
+    if not train_hparams_grid and not model_hparams_grid:
+        yield {}, {}
 
-    for train_combine in itertools.product(*train_vals):
-        train_dict = dict(zip(train_keys, train_combine))
-
+    elif not train_hparams_grid:
+        model_keys, model_vals = zip(*model_hparams_grid.items())
         for model_combine in itertools.product(*model_vals):
             model_dict = dict(zip(model_keys, model_combine))
+            yield model_dict, {}
 
-            yield model_dict, train_dict
+    elif not model_hparams_grid:
+        train_keys, train_vals = zip(*train_hparams_grid.items())
+        for train_combine in itertools.product(*train_vals):
+            train_dict = dict(zip(train_keys, train_combine))
+            yield {}, train_dict
+
+    else:
+        train_keys, train_vals = zip(*train_hparams_grid.items())
+        model_keys, model_vals = zip(*model_hparams_grid.items())
+
+        for train_combine in itertools.product(*train_vals):
+            train_dict = dict(zip(train_keys, train_combine))
+
+            for model_combine in itertools.product(*model_vals):
+                model_dict = dict(zip(model_keys, model_combine))
+
+                yield model_dict, train_dict
