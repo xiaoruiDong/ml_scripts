@@ -22,7 +22,7 @@ class CSVDataset(Dataset):
         path: str | Path = _random_data_path,
     ):
         df = pd.read_csv(path)
-        self.targets = torch.tensor(df["y"].values, dtype=torch.float32)
+        self.targets = torch.tensor(df[["y"]].values, dtype=torch.float32)
         self.inputs = torch.tensor(df.drop("y", axis=1).values, dtype=torch.float32)
 
     def __len__(self):
