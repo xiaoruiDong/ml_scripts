@@ -11,15 +11,6 @@ from train import train_model
 from utils import get_hparams, get_hparams_combinations
 
 
-default_cv_parameters = {
-    "n_folds_outer_cv": 5,
-    "n_folds_inner_cv": 5,
-    "batch_size": 32,
-    "num_epochs": 10,
-    "random_seed": 42,
-}
-
-
 def cross_validation(
     dataset: torch.utils.data.Dataset,
     model_class: Type[torch.nn.Module],
@@ -110,7 +101,7 @@ def nested_gridsearch_cv(
 
     for fold, (train_idx, test_idx) in enumerate(outer_cv.split(dataset)):
 
-        print("Outer Fold {fold}")
+        print(f"Outer Fold {fold}")
         train_dataset = Subset(dataset, train_idx)
         test_dataset = Subset(dataset, test_idx)
 
