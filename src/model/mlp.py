@@ -8,7 +8,7 @@ from torch import nn
 class MLP(nn.Module):
     """
     A simplified multi-layer perceptron (MLP) model whose hidden layer dimensions are the same
-    across all hidden layers. 
+    across all hidden layers.
 
     Args:
         input_dim (int): Size of the input data.
@@ -26,6 +26,7 @@ class MLP(nn.Module):
         >>> output = mlp(input)
         >>> print(output.shape)
     """
+
     def __init__(
         self,
         input_dim: int,
@@ -41,38 +42,28 @@ class MLP(nn.Module):
 
         self.layers = nn.Sequential()
         for i_layer in range(n_layers):
-            # Each layer consists of 
+            # Each layer consists of
             # linear -> batch_norm -> activation -> dropout
             if i_layer:
                 self.layers.add_module(
-                    f"linear{i_layer}",
-                    nn.Linear(hidden_dim, hidden_dim, bias=bias)
+                    f"linear{i_layer}", nn.Linear(hidden_dim, hidden_dim, bias=bias)
                 )
             else:
                 self.layers.add_module(
-                    f"linear{i_layer}",
-                    nn.Linear(input_dim, hidden_dim, bias=bias)
+                    f"linear{i_layer}", nn.Linear(input_dim, hidden_dim, bias=bias)
                 )
-            
+
             if batch_norm:
                 self.layers.add_module(
-                    f"batch_norm{i_layer}",
-                    nn.BatchNorm1d(hidden_dim)
+                    f"batch_norm{i_layer}", nn.BatchNorm1d(hidden_dim)
                 )
-            
-            self.layers.add_module(
-                f"act{i_layer}",
-                activation()
-            )
-            self.layers.add_module(
-                f"dropout{i_layer}",
-                nn.Dropout(dropout)
-            )
-        
+
+            self.layers.add_module(f"act{i_layer}", activation())
+            self.layers.add_module(f"dropout{i_layer}", nn.Dropout(dropout))
+
         self.layers.add_module(
-            f"linear{n_layers}",
-            nn.Linear(hidden_dim, output_dim, bias=bias)
+            f"linear{n_layers}", nn.Linear(hidden_dim, output_dim, bias=bias)
         )
-    
+
     def forward(self, x):
         return self.layers(x)

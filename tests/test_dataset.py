@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from data.dataset import CSVDataset, _random_data_path
 
+
 def test_dataset():
 
     dataset = CSVDataset()

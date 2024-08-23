@@ -26,7 +26,7 @@ def test_init(
     dropout,
 ):
     """
-    Test the initialization of mlp. This test only tests if 
+    Test the initialization of mlp. This test only tests if
     blocks can be created correctly.
     """
     mlp = MLP(
@@ -43,7 +43,7 @@ def test_init(
     layers = mlp.layers._modules
 
     # check input dim
-    assert layers['linear0'].in_features == input_dim
+    assert layers["linear0"].in_features == input_dim
     # infer the number of layers from names
     num_layers = len([k for k in layers.keys() if k.startswith("linear")]) - 1
     # check hidden layers
