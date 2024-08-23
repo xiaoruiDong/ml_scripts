@@ -5,7 +5,10 @@ from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader
+from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader as GraphDataLoader
 
+from model.gcn import GCN
 from utils import get_hparams
 
 
@@ -17,6 +20,36 @@ default_hparams = {
     "loss_fn": torch.nn.MSELoss,  # loss function
     "optimizer": torch.optim.Adam,  # optimizer
 }
+
+
+def _forward(
+    model: torch.nn.Module,
+    data: Data | tuple,
+    is_gcn: bool = False,
+    device: str = "cpu",
+) -> tuple:
+    """
+    A helper function to forward the data through the model.
+
+    Args:
+        model (torch.nn.Module): The model to be used for forward pass.
+        data (torch_geometric.data.Data): The data to be forwarded.
+        is_gcn (bool): Whether the model is a GCN model.
+        device (str): The device to use for forward pass.
+
+    Returns:
+        torch.Tensor: The output of the model.
+        torch.Tensor: The target of the data (if the model is a GCN model).
+    """
+    if is_gcn:
+        data.to(device)
+        output = model(data.x, data.edge_index, data.batch)
+        return output, data.y
+    else:
+        input, target = data
+        input = input.to(device)
+        target = target.to(device)
+        return model(input), target
 
 
 def train_one_epoch(
@@ -44,15 +77,14 @@ def train_one_epoch(
 
     # Move the model to the specified device
     model = model.to(_hparams["device"])
+    is_gcn = isinstance(model, GCN)
 
     # Set the model to training mode
     model.train()
 
-    for input, target in data_loader:
-        input = input.to(_hparams["device"])
-        target = target.to(_hparams["device"])
+    for data in data_loader:
         optimizer.zero_grad()
-        output = model(input)
+        output, target = _forward(model, data, is_gcn, _hparams["device"])
         loss = loss_fn(output, target)
         loss.backward()
         optimizer.step()
@@ -82,15 +114,15 @@ def evaluate_model(
 
     # Move the model to the specified device
     model = model.to(_hparams["device"])
+    is_gcn = isinstance(model, GCN)
 
     # Set the model to evaluation mode
     model.eval()
     total_loss = 0
     with torch.no_grad():
-        for input, target in data_loader:
-            input = input.to(_hparams["device"])
-            target = target.to(_hparams["device"])
-            output = model(input)
+
+        for data in data_loader:
+            output, target = _forward(model, data, is_gcn, _hparams["device"])
             total_loss += loss_fn(output, target).item()
 
     # Return the average loss
@@ -131,11 +163,13 @@ def train_model(
     save_path = Path(model_save_dir) / "best_model.pth"
 
     model = model.to(_hparams["device"])
+    is_gcn = isinstance(model, GCN)
 
-    train_loader = DataLoader(
+    data_loader_class = GraphDataLoader if is_gcn else DataLoader
+    train_loader = data_loader_class(
         train_dataset, batch_size=_hparams["batch_size"], shuffle=True
     )
-    val_loader = DataLoader(
+    val_loader = data_loader_class(
         val_dataset, batch_size=_hparams["batch_size"], shuffle=False
     )
 
