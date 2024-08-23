@@ -71,6 +71,33 @@ def nested_gridsearch_cv(
     save_model: bool = False,
     model_save_dir: str = ".",
 ):
+    """
+    Nested cross-validation for hyperparameter tuning.
+
+    Args:
+        dataset (torch.utils.data.Dataset): The dataset to use.
+        model_class (Type[torch.nn.Module]): The model class to use.
+        inner_cv (KFold): The inner cross-validation object.
+        outer_cv (KFold): The outer cross-validation object.
+        model_hparams_grid (dict | None, optional): The grid of model hyperparameters. Defaults to None,
+            for not tuning model hyperparameters. This parameter should be prepared as a dict of
+            parameter, value list pairs. Options refer to the hyperparameters of the specific model used.
+        train_hparams_grid (dict | None, optional): The grid of training hyperparameters. Defaults to None,
+            for not tuning training hyperparameters. This parameter should be prepared as a dict of
+            parameter, value list pairs. Options:
+            - lr (float): The learning rate for the optimizer. Default: 0.001
+            - batch_size (int): The batch size for the data loaders. Default: 64
+            - num_epochs (int): The number of epochs to train the model. Default: 10
+            - device (str): The device to use for training. Default: "cuda" if available, otherwise "cpu"
+            - loss_fn (torch.nn.modules.loss._Loss): The loss function used for training. Default:
+                torch.nn.MSELoss
+            - optimizer (torch.optim.Optimizer): The optimizer for the model. Default: torch.optim.Adam
+        save_model (bool, optional): Whether to save the model. Defaults to False.
+        model_save_dir (str, optional): The directory to save the model. Defaults to ".".
+
+    Returns:
+        tuple: A tuple containing the scores, models, and hyperparameters for each fold.
+    """
     if train_hparams_grid is None:
         train_hparams_grid = {}
 
