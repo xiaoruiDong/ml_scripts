@@ -67,3 +67,16 @@ class MLP(nn.Module):
 
     def forward(self, x):
         return self.layers(x)
+
+    @classmethod
+    def get_default_hparams(cls):
+        return {
+            "input_dim": 4,
+            "hidden_dim": 10,
+            "output_dim": 1,
+            "n_layers": 2,
+            "bias": True,
+            "activation": nn.ReLU,
+            "dropout": 0.0,
+            "batch_norm": False,
+        }
